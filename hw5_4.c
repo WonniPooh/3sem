@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-
-
 typedef struct THREAD_TO_DO
 {
   int thread_count;
@@ -28,7 +26,7 @@ void* my_thread(void* dummy)
     int current_x = 0;
     int i = 0;
      
-    while((matrix_size*matrix_size > elem_to_start) && ((loop_counter < elems_to_serve)||thread_num == thread_count - 1))
+    while( (matrix_size * matrix_size > elem_to_start) && ((loop_counter < elems_to_serve) || thread_num == thread_count - 1))
     { 
         current_y = elem_to_start / matrix_size;
         current_x = elem_to_start - current_y*matrix_size;
@@ -36,7 +34,7 @@ void* my_thread(void* dummy)
 
         for(i = 0; i < matrix_size; i++)
         {
-	        result += input -> matrix[current_y * matrix_size + i] * input -> matrix[i* matrix_size + current_x];
+	    result += input -> matrix[current_y * matrix_size + i] * input -> matrix[i * matrix_size + current_x];
         }      
     
         input -> output_matrix[current_y * matrix_size + current_x] = result;
