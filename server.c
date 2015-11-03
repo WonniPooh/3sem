@@ -23,14 +23,12 @@ typedef struct mymsgbuf_in
 {
 	long mtype;
 	mydata_t data;
-
 }mybuf_in_t;
 
 typedef struct mymsgbuf_out
 {
 	long mtype;
 	int result;
-	
 }mybuf_out_t;
 
 typedef struct thread_input
@@ -38,13 +36,11 @@ typedef struct thread_input
 	mybuf_in_t buf_in;
 	key_t key;
 	int thread_num;
-	
 }thread_t;
 
 void* my_thread(void* dummy) 
 {
-	int msquid = 0;
-	
+    int msquid = 0;
     thread_t* input = (thread_t*)dummy; 
     
     mybuf_out_t output = {};
@@ -53,12 +49,20 @@ void* my_thread(void* dummy)
     
     output.result = input -> buf_in.data.num_one * input -> buf_in.data.num_two;
     
+    /*
+     * передали бы сюда сразу msguid
+     */
     if((msquid = msgget(input -> key, 0666 | IPC_CREAT)) < 0)
 	{
 		printf("Can\'t get msquid\n");
 		exit(-1);
 	}
      
+    /*
+     * Гарантируется, что для очередей сообщений методы msgsnd и msgrcv потокобезопасны (thread-safety), т.е. можно спокойно вызывать её из нескольких потоков или процессов 
+     * и они отработают корректно.
+     */
+    
     pthread_mutex_lock(&mutex); 
     
     if(msgsnd(msquid, (mybuf_out_t *) &output, sizeof(int), 0) < 0)
@@ -116,11 +120,20 @@ int main()
 		{
 			printf("I recieved message! Process id is %d\n", mybuf_input.data.my_id);
 			sleep(20);
+      /* 
+       * FIXIT: 
+       * Вот что никогда-никогда не нужно делать, так это использовать label`ы. Это считается дурным тоном.
+       * С помощью буквально пары меток можно настолько запутать логику работы программы, что отладить её будет достаточно сложно.
+       */
 loop:
 
 			if(mybuf_input.mtype == 255)
 				exit(0);
 
+      /*
+       * В целом, это не самое изящное и хорошее решение, т.к. ваш ожидающий цикл из меток будет "съедать" 100% процессорного времени.
+       * Решение с семафорами лучше. Если вам свой вариант нравится больше, то оставьте его.
+       */
 			for(int i = 0; i < THREADS_AMNT; i++)
 			{
 				if(threads_used[i] == 0)
@@ -128,6 +141,9 @@ loop:
 					threads_used[i] = 1;
 					successfull_thread_creation = 1;
 					
+          /*
+           * function -> func?
+           */
 					funk_argument[i].buf_in = mybuf_input;
 					funk_argument[i].thread_num = i;
 					funk_argument[i].key = key;

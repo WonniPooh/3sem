@@ -47,6 +47,9 @@ int main()
   }
 
     mybuf_one.mtype = 1;
+    /*
+     * FIXIT: магические числа
+     */
     mybuf_one.my_data.num_one = 5;  
     mybuf_one.my_data.num_two = 4; 
     mybuf_one.my_data.my_id = getpid();    
