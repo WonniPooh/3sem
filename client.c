@@ -46,14 +46,18 @@ int main()
     exit(-1);
   }
 
-    mybuf_one.mtype = 1;
-    /*
-     * FIXIT: магические числа
-     */
-    mybuf_one.my_data.num_one = 5;  
-    mybuf_one.my_data.num_two = 4; 
-    mybuf_one.my_data.my_id = getpid();    
+    int input_num_one = 0;
+    int input_num_two = 0;
 
+    printf("Enter please two numbers you would like to multiply:\n");
+    scanf("%d", &input_num_one);
+    scanf("%d", &input_num_two);
+
+    mybuf_one.mtype = 1;
+    mybuf_one.my_data.my_id = getpid();    
+    mybuf_one.my_data.num_one = input_num_one;
+    mybuf_one.my_data.num_two = input_num_two;
+ 
     if(msgsnd(msqid, (struct msgbuf_in *) &mybuf_one, sizeof(struct data), 0) < 0)
     {
       printf("Can\'t send message to queue\n");
@@ -69,7 +73,7 @@ int main()
       exit(-1);
     }   
 
-   printf("5*4 = %d", mybuf_two.result);
+   printf("%d * %d = %d\n", input_num_one, input_num_two, mybuf_two.result);
  
   return 0;
 } 
