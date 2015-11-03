@@ -39,11 +39,8 @@ int main()
   }
 
     mybuf_one.mtype = 1;
-    /*
-     * FIXIT: не используйте в коде магические числа. Объявите константу N.
-     * Просто если вы захотите изменить 5 на другое число, то изменения необходимо будет внести в нескольких частях кода.
-     */
-    mybuf_one.input = 5;    
+    printf("Enter a number you wish to factorial, num < 10.\n");
+    scanf("%d", &mybuf_one.input);
 
     if(msgsnd(msqid, (struct msgbuf_in *) &mybuf_one, sizeof(int), 0) < 0)
     {
