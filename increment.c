@@ -5,19 +5,37 @@
 #include <sys/stat.h>
 #include <semaphore.h>
 
-
 int a = 0;
+/*
+ * Что значит слово static в этом контексте?
+ */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void* my_thread(void* dummy) {
 
     pthread_mutex_lock(&mutex);
 
+    /*
+     * FIXIT: Надо вынести 1000000 в отдельную константу.
+     */
+    
     for(int i = 0; i < 1000000; i++)
         a += 1;
 
     pthread_mutex_unlock(&mutex);
   
+    /*
+     * Фактически сейчас у вас аналог последовательного кода, что с формальной точки зрения подходит под условие задачи, но всё же.
+     * Можно было бы написать так:
+     * for(int i = 0; i < 1000000; i++)
+     * {
+     *  pthread_mutex_lock(&mutex);
+        a += 1;
+	pthread_mutex_unlock(&mutex);
+       }
+       чтобы мы ограничили доступ только к критической секции.
+     */
+    
     return NULL;
 }
 
