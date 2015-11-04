@@ -6,20 +6,19 @@
 #include <semaphore.h>
 
 int a = 0;
+const int cycle_duration = 1000000;
 /*
  * Что значит слово static в этом контексте?
  */
+ 
+ //Сейчас задумался, не знаю. Скопировал с сайта на котором читал про семафоры. 
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void* my_thread(void* dummy) {
 
     pthread_mutex_lock(&mutex);
-
-    /*
-     * FIXIT: Надо вынести 1000000 в отдельную константу.
-     */
     
-    for(int i = 0; i < 1000000; i++)
+    for(int i = 0; i < cycle_duration; i++)
         a += 1;
 
     pthread_mutex_unlock(&mutex);
@@ -35,6 +34,8 @@ void* my_thread(void* dummy) {
        }
        чтобы мы ограничили доступ только к критической секции.
      */
+     
+     /*Это понятно, спасибо, просто подумал что вызывать lock/unlock столько раз не будет эффективным.*/
     
     return NULL;
 }
