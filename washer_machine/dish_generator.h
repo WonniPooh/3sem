@@ -1,4 +1,3 @@
-const int WAITER_LOOPS = 2;
 const int END_OF_THE_DAY = 100500;
 
 void send_dishes_in_a_queue(int msgid, mybuf_t *mybuf_output, int size);
