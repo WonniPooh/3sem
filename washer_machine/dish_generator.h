@@ -101,6 +101,14 @@ void add_new_dirty(node_t* new_node)
 {
   int current_dish = rand() % 10 + 1;
 
+  /*
+   * FIXIT:
+   * Вы 10 раз написали почти один и тот же кусок кода.
+   * http://stackoverflow.com/questions/9655202/how-to-convert-integer-to-string-in-c
+   * +
+   * strcat
+   */
+  
   switch(current_dish)
   {
     case 1:  
