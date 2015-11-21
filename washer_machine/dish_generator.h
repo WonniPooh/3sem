@@ -105,6 +105,100 @@ void add_new_dirty(node_t* new_node)
 
   FILL_THE_DISH(current_dish, current_dish, current_dish);
 
+<<<<<<< HEAD
+=======
+  /*
+   * FIXIT:
+   * Вы 10 раз написали почти один и тот же кусок кода.
+   * http://stackoverflow.com/questions/9655202/how-to-convert-integer-to-string-in-c
+   * +
+   * strcat
+   */
+  
+  switch(current_dish)
+  {
+    case 1:  
+    
+    strcpy(new_node -> dish.dish_name, "glass1");		
+    new_node -> dish.time_to_dry = 1;		
+    new_node -> dish.time_to_wash = 1;					  
+    
+    break;
+    
+    case 2:  
+    
+    strcpy(new_node -> dish.dish_name, "glass2");
+    new_node -> dish.time_to_dry = 2;		
+    new_node -> dish.time_to_wash = 2;					  
+    
+    break;
+    
+    case 3:  
+    
+    strcpy(new_node -> dish.dish_name, "glass3");
+    new_node -> dish.time_to_dry = 3;		
+    new_node -> dish.time_to_wash = 3;					  
+    
+    break;
+    
+    case 4:  
+    
+    strcpy(new_node -> dish.dish_name, "glass4");		
+    new_node -> dish.time_to_dry = 4;		
+    new_node -> dish.time_to_wash = 4;							  
+    
+    break;
+    
+    case 5:  
+    
+    strcpy(new_node -> dish.dish_name, "glass5");	
+    new_node -> dish.time_to_dry = 5;		
+    new_node -> dish.time_to_wash = 5;						  
+    
+    break;
+    
+    case 6:  
+    
+    strcpy(new_node -> dish.dish_name, "glass6");	
+    new_node -> dish.time_to_dry = 6;		
+    new_node -> dish.time_to_wash = 6;						  
+    
+    break;
+    
+    case 7:  
+    
+    strcpy(new_node -> dish.dish_name, "glass7");	
+    new_node -> dish.time_to_dry = 7;		
+    new_node -> dish.time_to_wash = 7;						  
+    
+    break;
+    
+    case 8:  
+    
+    strcpy(new_node -> dish.dish_name, "glass8");	
+    new_node -> dish.time_to_dry = 8;		
+    new_node -> dish.time_to_wash = 8;						  
+    
+    break;
+        
+    case 9:  
+    
+    strcpy(new_node -> dish.dish_name, "glass9");		
+    new_node -> dish.time_to_dry = 9;		
+    new_node -> dish.time_to_wash = 9;							  
+    
+    break;
+    
+    case 10:  
+    
+    strcpy(new_node -> dish.dish_name, "glass10");	
+    new_node -> dish.time_to_dry = 10;		
+    new_node -> dish.time_to_wash = 10;							  
+    
+    break;
+    
+  }
+>>>>>>> 3976fd5c1b2181efa5a0125f0706f0bb7a65245b
 }
 
 void generate_dishes_queue()

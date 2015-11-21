@@ -16,9 +16,16 @@
 SEM.sem_op = (OP);\
 SEM.sem_flg = (FLAG);
 
+<<<<<<< HEAD
 #define FILL_THE_DISH(NUM, DRY_TIME, WASH_TIME) new_node -> dish.dish_name[5] += (NUM);\
 new_node -> dish.time_to_dry = (DRY_TIME);\
 new_node -> dish.time_to_wash = (WASH_TIME);
+=======
+/*
+ * Алексей, у вас очень большая программа + нет описания того, как её запускать.
+ * Давайте вы на семинаре поясните, как программа устроена, и продемонстрируете работу.
+ */
+>>>>>>> 3976fd5c1b2181efa5a0125f0706f0bb7a65245b
 
 enum 
 {
@@ -27,6 +34,9 @@ enum
   dryer
 };
 
+/*
+ * Обычно в таком стиле называют константы, а не названия структур.
+ */
 typedef struct KITCHEN_DISH
 {
   char dish_name[20];
