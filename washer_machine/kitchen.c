@@ -16,6 +16,10 @@
 SEM.sem_op = (OP);\
 SEM.sem_flg = (FLAG);
 
+#define FILL_THE_DISH(NUM, DRY_TIME, WASH_TIME) new_node -> dish.dish_name[5] += (NUM);\
+new_node -> dish.time_to_dry = (DRY_TIME);\
+new_node -> dish.time_to_wash = (WASH_TIME);
+
 enum 
 {
   waiter,
