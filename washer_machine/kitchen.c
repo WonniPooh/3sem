@@ -24,6 +24,11 @@ new_node -> dish.time_to_wash = (WASH_TIME);
 /*
  * Алексей, у вас очень большая программа + нет описания того, как её запускать.
  * Давайте вы на семинаре поясните, как программа устроена, и продемонстрируете работу.
+ *
+ *./a.out way_of_communication_between_generator_and_washer way_of_communication_between_washer_and_dryer dryer_table_size
+ * way_of_communication_between_generator_and_washer = {sem | queue}
+ * way_of_communication_between_washer_and_dryer = {sem | queue}
+ * example: ./a.out sem sem 1
  */
 
 enum 
