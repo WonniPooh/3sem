@@ -3,14 +3,14 @@
 
 void* my_handler(int nsig) 
 {
-	printf("HAHA! You cannot quit!\n");
+  printf("HAHA! You cannot quit!\n");
 }
 
 int main(void)
 {
-(void)signal(SIGINT, SIG_IGN);
-(void)signal(SIGQUIT, my_handler);
+  (void)signal(SIGINT, SIG_IGN);
+  (void)signal(SIGQUIT, my_handler);
 
-while(1);
-return 0;
+  while(1);
+  return 0;
 }
