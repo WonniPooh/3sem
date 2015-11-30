@@ -12,17 +12,17 @@ const int ASCII_SHIFT = 1;
 
 int main(int argc, char* argv[])
 {
-	if(argc != 2)
-	{
-		printf("Check amount of args!\n");
-		exit(-1);
-	}
-	
-	if(ASCII_SHIFT < 0)
-	{
-		printf("Check ASCII SHIFT ranges!\n");
-		exit(-1);
-	}
+    if(argc != 2)
+    {
+	printf("Check amount of args!\n");
+	exit(-1);
+    }
+
+    if(ASCII_SHIFT < 0)
+    {
+	printf("Check ASCII SHIFT ranges!\n");
+	exit(-1);
+    }
 		
     int fd = 0;
     struct stat file_info;
@@ -42,21 +42,21 @@ int main(int argc, char* argv[])
     {
         printf("Mapping failed\n");
         printf("%d\n", errno);
-		exit(-1);
+	exit(-1);
     }
     
     close(fd);
     
     for (int i = 0; i < size; i++) 
     {
-		map_mem_ptr[i] = (map_mem_ptr[i] + ASCII_SHIFT) % 127;
-	}  
+	map_mem_ptr[i] = (map_mem_ptr[i] + ASCII_SHIFT) % 127;
+    }  
     
     if (munmap((void *)map_mem_ptr, size) == -1)
     {
         printf("Can not unmup!\n");
         printf("%d\n", errno);
-		exit(-1);
+	exit(-1);
     }
     return 0;
 }
