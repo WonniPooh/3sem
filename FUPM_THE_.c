@@ -4,27 +4,25 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-void handler(int nsig)
+int main()
 {
-	
-}
+    int sig;
+    sigset_t sigset, empty_sigset;
 
-int main(void)
-{
-	int sig;
-	sigset_t sigset;
-	sigset_t empty_sigset;
-	sigemptyset(&sigset);
-	sigemptyset(&empty_sigset);
-	sigaddset(&sigset, SIGUSR1);
-	sigaddset(&sigset, SIGUSR2);
-	sigprocmask(SIG_SETMASK, &sigset, &empty_sigset);    
+    sigemptyset(&sigset);
+    sigemptyset(&empty_sigset);
+
+    sigaddset(&sigset, SIGUSR1);
+    sigaddset(&sigset, SIGUSR2);
+
+    sigprocmask(SIG_SETMASK, &sigset, &empty_sigset);    
+
     pid_t pid = fork();      
 
     if (pid == 0)
     {
-		pid = getppid();
-		signal(SIGUSR1, SIG_IGN);
+	pid = getppid();
+	signal(SIGUSR1, SIG_IGN);
 				
         while(1)
         {
@@ -35,7 +33,7 @@ int main(void)
     }
     else
     {
-		signal(SIGUSR2, SIG_IGN);
+	signal(SIGUSR2, SIG_IGN);
 	
         while(1)
         {
