@@ -5,6 +5,15 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
+
+/*
+ * Засчитано.
+ * Но, выносите все "магические" числа, вроде 255 в отдельные константы.
+ * Вы будете когда-нибудь работать в команде, и вас вечно будут "шпынять" за это.
+ * Вы просто ещё сами не сталкивались с проблемой, когда надо модифицировать чужой код, в котором куча "магических" чисел, 
+ * непонятно названы переменные и т.п.
+ */
+
 void send_the_char(unsigned char current_char, sigset_t* sigset, int* sig, pid_t pid);
 char recieve_the_char(sigset_t* sigset, int* sig, pid_t pid);
 
@@ -39,7 +48,6 @@ int main()
     {   
       send_the_char(str_to_send[i], &sigset, &sig, pid);
     }  
-
   }
   else
   {
@@ -66,6 +74,11 @@ void send_the_char(unsigned char current_char, sigset_t* sigset, int* sig, pid_t
   {
     current_bit = current_char & 1;
     
+    /*
+     * Куда лаконичнее и понятнее здесь было бы использовать тернарный оператор:
+     * kill(pid, current_bit ? SIGUSR1 : SIGUSR2);
+     * вместо ваших 4х строк.
+     */
     if(current_bit)
       kill(pid, SIGUSR1);
     else
