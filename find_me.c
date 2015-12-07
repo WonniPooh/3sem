@@ -6,11 +6,7 @@
 #include <dirent.h>
 #include <assert.h>
 
-/*
- * Посмотрите мои комментарии. Критически осмыслите их, поправьте, что считаете нужным, т.к. это не ошибки в коде, а
- * скорее замечания по стилю написания кода, которые частично субъективны.
- * И засчитаем.
- */
+#define PATHNAME_LENGTH 400 
 
 void find_the_file(const char* name_to_open, const char* name_to_find, const int depth_of_search);
 
@@ -19,6 +15,10 @@ int main(int argc, char* argv[])
   /*
    * Магистр Йода? Выглядит старанно, но дело ваше.
    * Лучше бы switch написали.
+   *
+   * switch - может быть, с другой стороны не так много разных случаев , мне кажется можно и if в этом месте.
+   * Нет, не Йода. Просто стараюсь всё заставить себя писать так. При потере одного из "=" получим ошибку а не
+   * непонятно откуда взявшийся баг.
    */
   if(3 == argc)
   {
@@ -50,7 +50,7 @@ void find_the_file(const char* name_to_open, const char* name_to_find, const int
    * FIXIT:
    * Отдельная константа для 400.
    */
-  char path[400] = {};
+  char path[PATHNAME_LENGTH] = {};
 
   while(current_file)
   {  
@@ -59,8 +59,11 @@ void find_the_file(const char* name_to_open, const char* name_to_find, const int
      * Что вы подразумевали, написав !!strcmp(...)
      * Почему два символа !?
      * Почему не просто strcmp(current_file -> d_name, ".")?
+     *
+     * Потому что мне надо было либо 0 либо 1, а ф-я возвращает еще и -1. Хотя по идее знак не имеет значения, ведь так? 
+     * Тогда почему - то решил что бы было только 0 и 1. Без отрицательных значений.
      */
-    if(S_ISDIR(buf.st_mode) && depth_of_search && (!!strcmp(current_file -> d_name, ".") && !!strcmp(current_file -> d_name, "..")))
+    if(S_ISDIR(buf.st_mode) && depth_of_search && (strcmp(current_file -> d_name, ".") && strcmp(current_file -> d_name, "..")))
     {
       strcpy(path, name_to_open);  
       strcat(path, "/");  
@@ -76,8 +79,10 @@ void find_the_file(const char* name_to_open, const char* name_to_find, const int
        * 2) strcmp(name_to_find, current_file -> d_name) == 0
        * Мне кажется, что 2й вариант более понятен, т.к. ф-я strcmp возвращает не булевы значения 0 или 1, а
        * числа < 0, ==0 и >0. Сходу 1й вариант заставляет задумываться.
+       *
+       * Субъективно. Просто так лаконичнее. И не возникнет точно ошибки с потерей одного равно.
        */
-      if(!strcmp(name_to_find, current_file -> d_name))
+      if(0 == strcmp(name_to_find, current_file -> d_name))
       {
         printf("path:: %s\n", name_to_open); 
       }
