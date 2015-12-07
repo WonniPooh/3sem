@@ -6,13 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 
-/*
- * Засчитано.
- * Но, выносите все "магические" числа, вроде 255 в отдельные константы.
- * Вы будете когда-нибудь работать в команде, и вас вечно будут "шпынять" за это.
- * Вы просто ещё сами не сталкивались с проблемой, когда надо модифицировать чужой код, в котором куча "магических" чисел, 
- * непонятно названы переменные и т.п.
- */
+#define STRLEN_TO_SEND 255
 
 void send_the_char(unsigned char current_char, sigset_t* sigset, int* sig, pid_t pid);
 char recieve_the_char(sigset_t* sigset, int* sig, pid_t pid);
@@ -35,9 +29,10 @@ int main()
   if (pid == 0)
   {
     pid = getppid();
-    int strlength = 0;    char str_to_send[255] = {};
+    int strlength = 0;    
+    char str_to_send[STRLEN_TO_SEND] = {};
    
-    printf("Enter a string you would like to send: (255 length max)\n");
+    printf("Enter a string you would like to send: (%d length max)\n", STRLEN_TO_SEND);
     scanf("%s", str_to_send);
    
     strlength = strlen(str_to_send);
@@ -52,7 +47,7 @@ int main()
   else
   {
     int strlength = 0;
-    char recieved_string[255] = {};
+    char recieved_string[STRLEN_TO_SEND] = {};
 
     strlength = recieve_the_char(&sigset, &sig, pid);
    
@@ -73,16 +68,8 @@ void send_the_char(unsigned char current_char, sigset_t* sigset, int* sig, pid_t
   for(int j = 0; j < 8; j++)
   {
     current_bit = current_char & 1;
-    
-    /*
-     * Куда лаконичнее и понятнее здесь было бы использовать тернарный оператор:
-     * kill(pid, current_bit ? SIGUSR1 : SIGUSR2);
-     * вместо ваших 4х строк.
-     */
-    if(current_bit)
-      kill(pid, SIGUSR1);
-    else
-      kill(pid, SIGUSR2);
+  
+    kill(pid, current_bit ? SIGUSR1 : SIGUSR2); //всё никак к нему не привыкну и не запомню как он раотает. Согласен, спасибо.
     
     current_char = current_char >> 1;  
     sigwait(sigset, sig); 
