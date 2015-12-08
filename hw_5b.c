@@ -36,7 +36,10 @@ int main()
     if(pid != 0)
     { 
       tokens_count = 0;
-         
+
+      /*
+       * Почему не fgets?
+       */
       is_it_EOF = read_the_string(opened_file, current_command);
 
       split(current_command, " ", &word_ptr, &tokens_count);
