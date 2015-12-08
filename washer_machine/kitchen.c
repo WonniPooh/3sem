@@ -17,9 +17,9 @@ SEM.sem_op = (OP);\
 SEM.sem_flg = (FLAG);
 
 
-#define FILL_THE_DISH(NUM, DRY_TIME, WASH_TIME) new_node -> dish.dish_name[5] += (NUM);\
-new_node -> dish.time_to_dry = (DRY_TIME);\
-new_node -> dish.time_to_wash = (WASH_TIME);
+#define FILL_THE_DISH(NUM, DRY_TIME, WASH_TIME) new_dish -> dish_name[5] += (NUM);\
+new_dish -> time_to_dry = (DRY_TIME);\
+new_dish -> time_to_wash = (WASH_TIME);
 
 /* 
  * Алексей, у вас очень большая программа + нет описания того, как её запускать.
@@ -47,26 +47,10 @@ typedef struct KITCHEN_DISH
   int is_it_dry;
 }dish_t;
 
-typedef struct DISH_NODE
-{
-  dish_t dish;
-  struct DISH_NODE* next;
-  struct DISH_NODE* prev;
-}node_t;
-
-typedef struct DISH_LIST
-{
-  node_t* first;
-  node_t* last;
-  node_t* first_data;
-  node_t* last_data;
-  int elem_count;
-}list_t;
-
 typedef struct MYMSGBUF
 {
   long mtype;
-  node_t dish_node;
+  dish_t dish_node;
   
 } mybuf_t;
 
@@ -76,6 +60,7 @@ const char pathname[] = "kitchen.c";
 const char pathname_to_wash[] = "dish_washer.h";
 const char pathname_to_dry[] = "dish_dryer.h";
 const int  WASHER_ARRAY_SIZE = 100;
+const int END_OF_THE_DAY = 100500;
 
 void run_process(int argc, char* argv[]);
 void dish_generator(int argc, char* argv[]);
@@ -91,15 +76,20 @@ void delete_shmem(int shmid);
 int queue_get_access(const char* my_pathname);
 void delete_queue(int shmid);
 
-node_t* attach_shmem(int shmid);
-void detach_shmem(node_t* shared_array_pointer);
+dish_t* attach_shmem(int shmid);
+void detach_shmem(dish_t* shared_array_pointer);
 
 #include "dish_generator.h"
 #include "dish_washer.h"
 #include "dish_dryer.h"
 
-int  main(int argc, char* argv[])
+int main(int argc, char* argv[])
 { 
+	if(argc != 4)
+  {
+    printf("Wrong arguments amount; Use: ./a.out <ctype 1> <ctype 2> <table size> \n");
+    exit(1);
+  }
   pid_t pid = 1;
   int status;
   for(int i = 0; i < 3; i++)
@@ -236,7 +226,7 @@ int shmem_get_access(const char* my_pathname, int size)
      exit(1);
    }
   
-   if((shmid = shmget(key, size * sizeof(node_t), 0666 | IPC_CREAT | IPC_EXCL)) < 0)
+   if((shmid = shmget(key, size * sizeof(dish_t), 0666 | IPC_CREAT | IPC_EXCL)) < 0)
    {        
        if(errno != EEXIST) 
        {  
@@ -245,7 +235,7 @@ int shmem_get_access(const char* my_pathname, int size)
        } 
        else 
        {
-           if((shmid = shmget(key, size * sizeof(node_t), 0)) < 0)
+           if((shmid = shmget(key, size * sizeof(dish_t), 0)) < 0)
            {
              printf("Can't find shared memory\n");
              exit(1);
@@ -265,11 +255,11 @@ void delete_shmem(int shmid)
    }
 }
 
-node_t* attach_shmem(int shmid)
+dish_t* attach_shmem(int shmid)
 {
-  node_t* shared_array_pointer = NULL;
+  dish_t* shared_array_pointer = NULL;
       
-  if((shared_array_pointer = (node_t*)shmat(shmid, NULL, 0)) == (node_t*)(-1))
+  if((shared_array_pointer = (dish_t*)shmat(shmid, NULL, 0)) == (dish_t*)(-1))
   {
      printf("Can't attach shared memory\n");
      exit(-1);
@@ -278,7 +268,7 @@ node_t* attach_shmem(int shmid)
    return shared_array_pointer;
 }
 
-void detach_shmem(node_t* shared_array_pointer)
+void detach_shmem(dish_t* shared_array_pointer)
 {    
    if(shmdt((char*)shared_array_pointer) < 0)
    {
@@ -315,6 +305,3 @@ void delete_queue(int msgid)
       exit(-1);
    }
 }
-
-
-

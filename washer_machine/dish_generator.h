@@ -1,10 +1,7 @@
-const int END_OF_THE_DAY = 100500;
-
 void send_dishes_in_a_queue(int msgid, mybuf_t *mybuf_output, int size);
-void create_list(list_t* list_state, int list_size);
-void fill_the_table(list_t* list_state);
-void add_new_dirty(node_t* new_node);
-void end_it(node_t* new_node);
+void fill_the_table(dish_t* list_state);
+void add_new_dirty(dish_t* new_dish);
+void end_it(dish_t* new_node);
 void generate_dishes_queue();
 void generate_dishes_sem();
 
@@ -13,95 +10,47 @@ void generate_dishes_sem()
   int shmid = shmem_get_access(pathname, WASHER_ARRAY_SIZE);
    
   srand(time(NULL));
- 
-  list_t* list_state = (list_t*)calloc(1, sizeof(list_t));
-    
-  list_state -> first = attach_shmem(shmid);
-  create_list(list_state, WASHER_ARRAY_SIZE);
-  fill_the_table(list_state);
+     
+  dish_t* first_node = attach_shmem(shmid);
+  fill_the_table(first_node);
 
   printf("Generator semaphore mission complete!\n");
-  
 }
 
-void create_list(list_t* list_state, int list_size)
+void fill_the_table(dish_t* first_node)
 {
-	node_t* current_node = list_state -> first;
-	list_state -> last = &current_node[list_size - 1];
-	list_state -> first_data = &current_node[0];
-	list_state -> last_data = &current_node[0];								//empty list
-
-	for(int i = 0; i < list_size; i++)
-	{	
-		if(i != list_size - 1)
-			current_node -> next = current_node + 1;
-		else
-			current_node -> next = list_state -> first;
-	
-		if(i != 0)
-			current_node -> prev = current_node - 1;
-		else
-			current_node -> prev = &current_node[list_size - 1];
-		
-		current_node = current_node + 1;			
-	}
-	
-	current_node = list_state -> first;
-  
- /* for(int i = 0; i < list_size; i++)
-	{
-		printf("%d I am %p;\t Prev next = %p;\t Next prev = %p\n", i, current_node, current_node -> next -> prev, current_node -> prev -> next);
-		current_node = current_node -> next;
-	}
-  */
-}
-
-void fill_the_table(list_t* list_state)
-{
+  dish_t* current_node = first_node;
   int semid = sem_get_access(pathname);   
   struct sembuf there_is_full = {};
   PREPARE_OP(there_is_full , 0, 1, 0);
   
   int dishes_amount = rand() % 10 + 1;
 
-  if(WASHER_ARRAY_SIZE - list_state -> elem_count >= dishes_amount + 1)
+  for(int i = 0; i < dishes_amount; i++)
   {
-    list_state -> elem_count += dishes_amount;
-    
-    for(int i = 0; i < list_state -> elem_count; i++)
-    {
-      if(list_state -> last_data -> dish.time_to_wash == 0 || list_state -> last_data -> dish.is_it_clean == 1)
-        add_new_dirty(list_state -> last_data);
-     
-      semop(semid, &there_is_full, 1);
-      
-      printf("%s : %d\n", list_state -> last_data -> dish.dish_name, list_state -> last_data -> dish.time_to_wash); 
-     
-      list_state -> last_data = list_state -> last_data -> next; 
-    }
-        
-    list_state -> elem_count ++;
-    end_it(list_state -> last_data);
+    if(current_node -> time_to_wash == 0 || current_node -> is_it_clean == 1)
+      add_new_dirty(current_node);
+   
     semop(semid, &there_is_full, 1);
-    list_state -> last_data = list_state -> last_data -> next; 
+    
+    printf("%s : %d\n", current_node -> dish_name, current_node -> time_to_wash); 
+    current_node++; 
   }
-  else
-  {
-    printf("No enough place\n");
-  }
-
+  
+  end_it(current_node);
+  semop(semid, &there_is_full, 1);
 }
 
-void end_it(node_t* new_node)
+void end_it(dish_t* new_node)
 {
-  new_node -> dish.time_to_wash = END_OF_THE_DAY;
+  new_node -> time_to_wash = END_OF_THE_DAY;
 }
     
-void add_new_dirty(node_t* new_node)
+void add_new_dirty(dish_t* new_dish)
 {
   int current_dish = rand() % 10;
 
-  strcpy(new_node -> dish.dish_name, "glass0");	
+  strcpy(new_dish -> dish_name, "glass0");	
 
   FILL_THE_DISH(current_dish, current_dish, current_dish);
   
@@ -121,13 +70,13 @@ void generate_dishes_queue()
   {    
     add_new_dirty(&mybuf_output.dish_node);
     mybuf_output.mtype = 1;
-    send_dishes_in_a_queue(msgid, &mybuf_output, sizeof(node_t));
-    printf("%s : %d\n", mybuf_output.dish_node.dish.dish_name, mybuf_output.dish_node.dish.time_to_wash); 
+    send_dishes_in_a_queue(msgid, &mybuf_output, sizeof(dish_t));
+    printf("%s : %d\n", mybuf_output.dish_node.dish_name, mybuf_output.dish_node.time_to_wash); 
   }
   
   mybuf_output.mtype = 1;
-  mybuf_output.dish_node.dish.time_to_wash = END_OF_THE_DAY; 
-  send_dishes_in_a_queue(msgid, &mybuf_output, sizeof(node_t));
+  mybuf_output.dish_node.time_to_wash = END_OF_THE_DAY; 
+  send_dishes_in_a_queue(msgid, &mybuf_output, sizeof(dish_t));
   printf("Generator queue mission complete!\n");
 }
 
@@ -140,4 +89,3 @@ void send_dishes_in_a_queue(int msgid, mybuf_t *mybuf_output, int size)
     exit(-1);
   }
 }
-
