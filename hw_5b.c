@@ -2,89 +2,90 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <assert.h>
 
+#define STR_MAX_LENGTH 1000
+#define FILENAME_MAX_LENGTH 255
+#define MAX_CMD_NUM 255
+
+void split(char* string, char* delimiters, char*** token_ptr, int* tokensCount);
+int read_the_string(FILE* opened_file, char* file_input);
+
+
 int main()
 {
-
-   printf("Enter please a filename with its extension\n");
-   /*
-    * Все 255 и 1000 надо вынести в отдельные константы.
-    */
-   char filename[255] = {};
-   scanf("%s", filename);
-   
-   char** line_ptr[255] = {}; 
-   char* commands_ptr[255] = {}; 
-   char file_input[1000] = {};
-   
-   FILE* opened_file = fopen(filename, "r");
-   assert(opened_file);
-   
-   char ch = 1;
-   int counter = 0;
-   int commands_counter = 1;
-   int line_counter = 1;
-   
-   line_ptr[0] = commands_ptr;
-   commands_ptr[0] = file_input; 
-
-   do
-   {
-     file_input[counter] = fgetc(opened_file);  
-   }
-   while (file_input[counter++] != EOF);
-
-   fclose(opened_file);
-
-   counter--;
- 
-   /*
-    * Вместо того, чтобы написать нормальную ф-ю Split c использованием strtok, вы написали свой "велосипед", который работает, по-моему, не всегда.
-    * Например, что, если у вас слова разделены несколькими пробельными символами?
-    * 
-    * Идея была в том, что вы в качестве 1го домашнего упражнения, напишите ф-ю Split с сигнатурой, которую на семинаре обсудили (она довольно общая и данную ф-ю можно будет применять где угодно
-    * без каких-либо модификаций). А потом это ф-ю примените здесь.
-    * 
-    * Нужно стараться каждое своё действие в программе выносить в отдельную ф-ю: считать строки, разбить строки на слова, запустить команды. 
-    * Такое разбиение делает код самодокументируемым, и в нем гораздо легче разбираться.
-    * Плюс это делает код модульным и целую ф-ю без изменений можно будет задействовать в другом месте. Это позволить избежать дублирования кода.
-    */
-   
-   for(int i = 0; i < counter; i++)
-   {
-      if(file_input[i] == ' ')
-      { 
-         file_input[i] = NULL;
-         if(file_input[i+1] != EOF)
-            commands_ptr[commands_counter++] = &file_input[i+1];
-      }
-      else if(file_input[i] == '\n')
-      {  
-          file_input[i] = NULL;
-          if(file_input[i+1] != EOF)
-          {
-             commands_ptr[commands_counter++] = NULL;
-             commands_ptr[commands_counter] = &file_input[i+1];
-             line_ptr[line_counter++] = &commands_ptr[commands_counter++];
-          }
+  pid_t pid = 1;
+  int tokens_count = 0;
+  int is_it_EOF = 0;
+  int line_counter = 1;
+  int wait_arg = 0;
+  char** word_ptr = (char**)calloc(MAX_CMD_NUM, sizeof(char*));
+  char filename[FILENAME_MAX_LENGTH] = {};
+  char current_command[STR_MAX_LENGTH] = {};
   
-      }
-   }
+  printf("Enter please a filename with its extension\n");
+  scanf("%s", filename);
 
-   commands_ptr[commands_counter] = NULL;
-int wait_arg = 0;
-   for(int i = 0; i < line_counter; i++)
-   {
-     pid_t pid = fork();
-     if (pid == 0)
-     {
-        int wait_time = atoi(line_ptr[i][0]);
-        printf("wait time is %d\n", wait_time);
-        sleep(wait_time);
-	printf("wait time is %d\n", wait_time);
-        execvp(line_ptr[i][1], line_ptr[i] + 1); 
-     }
-   }
+  FILE* opened_file = fopen(filename, "r");
+  assert(opened_file);
+
+  while(!is_it_EOF)
+  {
+    if(pid != 0)
+    { 
+      tokens_count = 0;
+         
+      is_it_EOF = read_the_string(opened_file, current_command);
+
+      split(current_command, " ", &word_ptr, &tokens_count);
+     
+      pid = fork();
+    }
+    else if (pid == 0)
+    {
+      int wait_time = atoi(word_ptr[0]);
+      printf("wait time is %d\n", wait_time);
+      sleep(wait_time);
+      execvp(word_ptr[1], word_ptr + 1); 
+    }
+
+  }
+  
+  fclose(opened_file);
+}
+
+int read_the_string(FILE* opened_file, char* file_input)
+{
+  int counter = -1;
+  int ret_val = 0;
+
+  do
+  {
+    counter++;
+    file_input[counter] = fgetc(opened_file);  
+  }
+  while (file_input[counter] != '\n' && file_input[counter] != EOF);
+        
+  ret_val = (EOF == file_input[counter]) ? 1 : 0; 
+  
+  file_input[counter] = '\0';
+  
+  return  ret_val;
+}
+
+void split(char* string, char* delimiters, char*** token_ptr, int* tokensCount)
+{
+    char** token = *token_ptr;
+    int counter = 0;
+    token[counter] = strtok(string, delimiters);
+    
+    while(token[counter])
+    {
+      counter++;
+      token[counter] = strtok(NULL, delimiters);
+    }
+    
+    *tokensCount = counter;
 }
