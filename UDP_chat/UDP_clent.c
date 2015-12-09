@@ -17,7 +17,6 @@ int main(int argc, char** argv[])
 {
   int socket_fd;
   int msg_size_recieved = 0;
-  int len;
   char sendmsg[MAX_MSG_LEN] = {};
   char recvmsg[MAX_MSG_LEN] = {};
   struct sockaddr_in serv_addr = {};
@@ -25,7 +24,7 @@ int main(int argc, char** argv[])
 
   if (argc != 2)
   {
-    printf("Usage: ./a.out 127.0.0.1 \n");
+    printf("Usage: ./a.out <server ip adress> \n");
     exit(1);
   }
   
@@ -57,7 +56,7 @@ int main(int argc, char** argv[])
     close(socket_fd);
     exit(1);
   }
-  printf("String -> Your name:\n");
+  printf("Choose a nickname please:\n");
 
   fgets(sendmsg, MAX_NICK_LEN, stdin);
   sendmsg[strlen(sendmsg) - 1 ] = '\0';
@@ -102,6 +101,8 @@ int main(int argc, char** argv[])
       }
       
       printf("%s\n", recvmsg);
+      
+      bzero(recvmsg, msg_size_recieved);
     }
   }
 
